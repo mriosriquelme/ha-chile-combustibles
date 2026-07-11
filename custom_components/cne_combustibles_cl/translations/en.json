@@ -1,17 +1,18 @@
 {
-  "title": "CNE Chile Fuel Prices",
+  "title": "Chile Fuel Prices",
   "config": {
     "step": {
       "user": {
         "title": "Connect to the CNE API",
-        "description": "The Home Assistant location will be used to find nearby fuel prices.",
+        "description": "Home Assistant's configured location will be used to find nearby prices.",
         "data": {
           "email": "CNE email",
           "password": "CNE password",
-          "radius_km": "Search radius (km)",
-          "include_assisted": "Include assisted service prices",
+          "radius_km": "Search radius",
+          "include_assisted": "Include attended prices",
           "include_self_service": "Include self-service prices",
-          "update_interval_hours": "Update interval (hours)"
+          "update_interval_hours": "Update interval",
+          "top_stations": "Number of stations in Top list"
         }
       },
       "reauth_confirm": {
@@ -23,7 +24,7 @@
     "error": {
       "cannot_connect": "Unable to connect to the CNE API.",
       "invalid_auth": "Invalid email or password.",
-      "unknown": "Unexpected error."
+      "unknown": "An unexpected error occurred."
     },
     "abort": {
       "already_configured": "This account is already configured.",
@@ -33,12 +34,13 @@
   "options": {
     "step": {
       "init": {
-        "title": "CNE Fuel options",
+        "title": "Chile Fuel Prices options",
         "data": {
-          "radius_km": "Search radius (km)",
-          "include_assisted": "Include assisted service prices",
+          "radius_km": "Search radius",
+          "include_assisted": "Include attended prices",
           "include_self_service": "Include self-service prices",
-          "update_interval_hours": "Update interval (hours)"
+          "update_interval_hours": "Update interval",
+          "top_stations": "Number of stations in Top list"
         }
       }
     }
@@ -50,7 +52,8 @@
       "fuel_97": {"name": "Cheapest 97 gasoline"},
       "fuel_diesel": {"name": "Cheapest diesel"},
       "fuel_kerosene": {"name": "Cheapest kerosene"},
-      "nearest_station": {"name": "Nearest station"}
+      "nearest_station": {"name": "Nearest station"},
+      "stations_in_radius": {"name": "Stations within radius"}
     }
   }
 }

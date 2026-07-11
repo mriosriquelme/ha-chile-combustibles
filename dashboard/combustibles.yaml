@@ -1,0 +1,38 @@
+type: vertical-stack
+cards:
+  - type: heading
+    heading: Combustibles cercanos
+    icon: mdi:gas-station
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: tile
+        entity: sensor.cne_combustibles_chile_gasolina_93_mas_barata
+        name: Gasolina 93
+        vertical: false
+      - type: tile
+        entity: sensor.cne_combustibles_chile_gasolina_95_mas_barata
+        name: Gasolina 95
+        vertical: false
+      - type: tile
+        entity: sensor.cne_combustibles_chile_gasolina_97_mas_barata
+        name: Gasolina 97
+        vertical: false
+      - type: tile
+        entity: sensor.cne_combustibles_chile_diesel_mas_barato
+        name: Diésel
+        vertical: false
+      - type: tile
+        entity: sensor.cne_combustibles_chile_kerosene_mas_barato
+        name: Kerosene
+        vertical: false
+      - type: tile
+        entity: sensor.cne_combustibles_chile_estacion_mas_cercana
+        name: Estación más cercana
+        vertical: false
+  - type: entities
+    title: Cobertura
+    entities:
+      - entity: sensor.cne_combustibles_chile_estaciones_en_el_radio
+        name: Estaciones encontradas

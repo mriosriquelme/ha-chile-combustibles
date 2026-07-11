@@ -1,4 +1,4 @@
-"""Sensor platform for CNE Combustibles Chile."""
+"""Sensor platform for Chile Combustibles."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from homeassistant.components.sensor import SensorEntity, SensorEntityDescriptio
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfLength
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -48,24 +49,36 @@ NEAREST_SENSOR = SensorEntityDescription(
     suggested_display_precision=2,
 )
 
+STATIONS_COUNT_SENSOR = SensorEntityDescription(
+    key="stations_in_radius",
+    translation_key="stations_in_radius",
+    name="Estaciones en el radio",
+    icon="mdi:map-marker-radius",
+)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up CNE sensors."""
+    """Set up Chile Combustibles sensors."""
     coordinator: CNECombustiblesCoordinator = entry.runtime_data
     entities: list[SensorEntity] = [
         CNEFuelSensor(coordinator, entry, description)
         for description in FUEL_SENSORS
     ]
-    entities.append(CNENearestStationSensor(coordinator, entry, NEAREST_SENSOR))
+    entities.extend(
+        (
+            CNENearestStationSensor(coordinator, entry, NEAREST_SENSOR),
+            CNEStationsCountSensor(coordinator, entry, STATIONS_COUNT_SENSOR),
+        )
+    )
     async_add_entities(entities)
 
 
 class CNEBaseSensor(CoordinatorEntity[CNECombustiblesCoordinator], SensorEntity):
-    """Base CNE sensor."""
+    """Base sensor for Chile Combustibles."""
 
     _attr_has_entity_name = True
 
@@ -78,50 +91,44 @@ class CNEBaseSensor(CoordinatorEntity[CNECombustiblesCoordinator], SensorEntity)
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
-        self._attr_device_info = {
-            "identifiers": {(DOMAIN, entry.entry_id)},
-            "name": NAME,
-            "manufacturer": MANUFACTURER,
-            "model": "API Combustibles",
-            "configuration_url": "https://api.cne.cl/",
-        }
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry.entry_id)},
+            name=NAME,
+            manufacturer=MANUFACTURER,
+            model="API Combustibles",
+            configuration_url="https://api.cne.cl",
+        )
 
 
 class CNEFuelSensor(CNEBaseSensor):
-    """Cheapest fuel sensor."""
+    """Sensor exposing the cheapest fuel offer."""
 
     entity_description: CNEFuelSensorDescription
 
     @property
     def native_value(self) -> float | None:
-        """Return fuel price."""
         offer = self._offer
-        return offer.price if offer else None
+        return round(offer.price) if offer else None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Return station details."""
         offer = self._offer
-        if offer is None:
-            return {
-                "stations_in_radius": self.coordinator.data.stations_in_radius,
-                "total_stations": self.coordinator.data.total_stations,
-            }
-
-        return {
-            "brand": offer.brand,
-            "address": offer.address,
-            "distance_km": offer.distance_km,
-            "service_type": offer.service_type,
-            "last_price_update": offer.updated_at,
-            "unit": offer.unit,
-            "station_code": offer.station_code,
-            "latitude": offer.latitude,
-            "longitude": offer.longitude,
-            "google_maps_url": offer.maps_url,
+        attrs: dict[str, Any] = {
+            "average_price": self.coordinator.data.average_prices.get(
+                self.entity_description.fuel_key
+            ),
             "stations_in_radius": self.coordinator.data.stations_in_radius,
             "total_stations": self.coordinator.data.total_stations,
+            "top_stations": [
+                item.as_attribute_dict()
+                for item in self.coordinator.data.top_offers.get(
+                    self.entity_description.fuel_key, []
+                )
+            ],
         }
+        if offer:
+            attrs.update(offer.as_attribute_dict())
+        return attrs
 
     @property
     def _offer(self) -> FuelOffer | None:
@@ -133,22 +140,31 @@ class CNENearestStationSensor(CNEBaseSensor):
 
     @property
     def native_value(self) -> float | None:
-        """Return distance to nearest station."""
         station = self.coordinator.data.nearest_station
         return station.distance_km if station else None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Return nearest station details."""
         station = self.coordinator.data.nearest_station
-        if station is None:
-            return {}
-        return {
-            "brand": station.brand,
-            "address": station.address,
-            "station_code": station.station_code,
-            "latitude": station.latitude,
-            "longitude": station.longitude,
-            "google_maps_url": station.maps_url,
-            "prices": station.prices,
+        attrs: dict[str, Any] = {
+            "nearby_stations": [
+                item.as_attribute_dict()
+                for item in self.coordinator.data.nearby_stations
+            ]
         }
+        if station:
+            attrs.update(station.as_attribute_dict())
+            attrs["prices"] = station.prices
+        return attrs
+
+
+class CNEStationsCountSensor(CNEBaseSensor):
+    """Number of stations inside the configured radius."""
+
+    @property
+    def native_value(self) -> int:
+        return self.coordinator.data.stations_in_radius
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        return {"total_stations": self.coordinator.data.total_stations}

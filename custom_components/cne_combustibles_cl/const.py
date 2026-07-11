@@ -1,11 +1,9 @@
-"""Constants for CNE Combustibles Chile."""
+"""Constants for Chile Combustibles."""
 
 from __future__ import annotations
 
-from datetime import timedelta
-
 DOMAIN = "cne_combustibles_cl"
-NAME = "CNE Combustibles Chile"
+NAME = "Chile Combustibles"
 MANUFACTURER = "Comisión Nacional de Energía"
 
 CONF_EMAIL = "email"
@@ -14,17 +12,21 @@ CONF_RADIUS_KM = "radius_km"
 CONF_UPDATE_INTERVAL_HOURS = "update_interval_hours"
 CONF_INCLUDE_ASSISTED = "include_assisted"
 CONF_INCLUDE_SELF_SERVICE = "include_self_service"
+CONF_TOP_STATIONS = "top_stations"
 
 DEFAULT_RADIUS_KM = 20.0
 DEFAULT_UPDATE_INTERVAL_HOURS = 6
 DEFAULT_INCLUDE_ASSISTED = True
 DEFAULT_INCLUDE_SELF_SERVICE = True
+DEFAULT_TOP_STATIONS = 5
 DEFAULT_TIMEOUT = 30
 
 MIN_RADIUS_KM = 1.0
 MAX_RADIUS_KM = 200.0
 MIN_UPDATE_INTERVAL_HOURS = 1
 MAX_UPDATE_INTERVAL_HOURS = 24
+MIN_TOP_STATIONS = 1
+MAX_TOP_STATIONS = 10
 
 BASE_URL = "https://api.cne.cl"
 LOGIN_ENDPOINT = "/api/login"
@@ -64,5 +66,3 @@ FUEL_DEFINITIONS: dict[str, dict[str, object]] = {
         "self_service_keys": ("AKE",),
     },
 }
-
-DEFAULT_UPDATE_INTERVAL = timedelta(hours=DEFAULT_UPDATE_INTERVAL_HOURS)

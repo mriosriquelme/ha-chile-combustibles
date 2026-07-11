@@ -1,4 +1,4 @@
-"""Config flow for CNE Combustibles Chile."""
+"""Config flow for Chile Combustibles."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers import selector
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import CNEApiClient
 from .const import (
@@ -19,36 +19,81 @@ from .const import (
     CONF_INCLUDE_ASSISTED,
     CONF_INCLUDE_SELF_SERVICE,
     CONF_RADIUS_KM,
+    CONF_TOP_STATIONS,
     CONF_UPDATE_INTERVAL_HOURS,
     DEFAULT_INCLUDE_ASSISTED,
     DEFAULT_INCLUDE_SELF_SERVICE,
     DEFAULT_RADIUS_KM,
+    DEFAULT_TOP_STATIONS,
     DEFAULT_UPDATE_INTERVAL_HOURS,
     DOMAIN,
     MAX_RADIUS_KM,
+    MAX_TOP_STATIONS,
     MAX_UPDATE_INTERVAL_HOURS,
     MIN_RADIUS_KM,
+    MIN_TOP_STATIONS,
     MIN_UPDATE_INTERVAL_HOURS,
+    NAME,
 )
 from .exceptions import CNEAuthenticationError, CNEError
 
 
+def _number_selector(minimum: float, maximum: float, unit: str) -> selector.NumberSelector:
+    return selector.NumberSelector(
+        selector.NumberSelectorConfig(
+            min=minimum,
+            max=maximum,
+            step=1,
+            unit_of_measurement=unit,
+            mode=selector.NumberSelectorMode.BOX,
+        )
+    )
+
+
+def _settings_schema(defaults: dict[str, Any]) -> vol.Schema:
+    return vol.Schema(
+        {
+            vol.Optional(
+                CONF_RADIUS_KM,
+                default=defaults.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM),
+            ): _number_selector(MIN_RADIUS_KM, MAX_RADIUS_KM, "km"),
+            vol.Optional(
+                CONF_INCLUDE_ASSISTED,
+                default=defaults.get(CONF_INCLUDE_ASSISTED, DEFAULT_INCLUDE_ASSISTED),
+            ): bool,
+            vol.Optional(
+                CONF_INCLUDE_SELF_SERVICE,
+                default=defaults.get(
+                    CONF_INCLUDE_SELF_SERVICE, DEFAULT_INCLUDE_SELF_SERVICE
+                ),
+            ): bool,
+            vol.Optional(
+                CONF_UPDATE_INTERVAL_HOURS,
+                default=defaults.get(
+                    CONF_UPDATE_INTERVAL_HOURS, DEFAULT_UPDATE_INTERVAL_HOURS
+                ),
+            ): _number_selector(
+                MIN_UPDATE_INTERVAL_HOURS, MAX_UPDATE_INTERVAL_HOURS, "h"
+            ),
+            vol.Optional(
+                CONF_TOP_STATIONS,
+                default=defaults.get(CONF_TOP_STATIONS, DEFAULT_TOP_STATIONS),
+            ): _number_selector(MIN_TOP_STATIONS, MAX_TOP_STATIONS, "estaciones"),
+        }
+    )
+
+
 class CNECombustiblesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for CNE Combustibles Chile."""
+    """Handle a config flow for Chile Combustibles."""
 
-    VERSION = 1
+    VERSION = 2
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Handle the initial step."""
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         errors: dict[str, str] = {}
-
         if user_input is not None:
             email = user_input[CONF_EMAIL].strip().lower()
             await self.async_set_unique_id(email)
             self._abort_if_unique_id_configured()
-
             try:
                 client = CNEApiClient(
                     async_get_clientsession(self.hass),
@@ -64,67 +109,31 @@ class CNECombustiblesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "unknown"
             else:
                 return self.async_create_entry(
-                    title=f"CNE Combustibles ({email})",
+                    title=NAME,
                     data={
                         CONF_EMAIL: email,
                         CONF_PASSWORD: user_input[CONF_PASSWORD],
                         CONF_RADIUS_KM: user_input[CONF_RADIUS_KM],
-                        CONF_INCLUDE_ASSISTED: user_input[
-                            CONF_INCLUDE_ASSISTED
-                        ],
+                        CONF_INCLUDE_ASSISTED: user_input[CONF_INCLUDE_ASSISTED],
                         CONF_INCLUDE_SELF_SERVICE: user_input[
                             CONF_INCLUDE_SELF_SERVICE
                         ],
                         CONF_UPDATE_INTERVAL_HOURS: user_input[
                             CONF_UPDATE_INTERVAL_HOURS
                         ],
+                        CONF_TOP_STATIONS: user_input[CONF_TOP_STATIONS],
                     },
                 )
 
-        schema = vol.Schema(
+        schema = _settings_schema({}).extend(
             {
                 vol.Required(CONF_EMAIL): str,
                 vol.Required(CONF_PASSWORD): str,
-                vol.Optional(
-                    CONF_RADIUS_KM, default=DEFAULT_RADIUS_KM
-                ): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=MIN_RADIUS_KM,
-                        max=MAX_RADIUS_KM,
-                        step=1,
-                        unit_of_measurement="km",
-                        mode=selector.NumberSelectorMode.BOX,
-                    )
-                ),
-                vol.Optional(
-                    CONF_INCLUDE_ASSISTED, default=DEFAULT_INCLUDE_ASSISTED
-                ): bool,
-                vol.Optional(
-                    CONF_INCLUDE_SELF_SERVICE,
-                    default=DEFAULT_INCLUDE_SELF_SERVICE,
-                ): bool,
-                vol.Optional(
-                    CONF_UPDATE_INTERVAL_HOURS,
-                    default=DEFAULT_UPDATE_INTERVAL_HOURS,
-                ): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=MIN_UPDATE_INTERVAL_HOURS,
-                        max=MAX_UPDATE_INTERVAL_HOURS,
-                        step=1,
-                        unit_of_measurement="h",
-                        mode=selector.NumberSelectorMode.BOX,
-                    )
-                ),
             }
         )
-        return self.async_show_form(
-            step_id="user", data_schema=schema, errors=errors
-        )
+        return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
 
-    async def async_step_reauth(
-        self, entry_data: dict[str, Any]
-    ) -> FlowResult:
-        """Start reauthentication."""
+    async def async_step_reauth(self, entry_data: dict[str, Any]) -> FlowResult:
         self._reauth_entry = self.hass.config_entries.async_get_entry(
             self.context["entry_id"]
         )
@@ -133,10 +142,8 @@ class CNECombustiblesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_reauth_confirm(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Confirm reauthentication."""
         errors: dict[str, str] = {}
         entry = self._reauth_entry
-
         if user_input is not None:
             try:
                 client = CNEApiClient(
@@ -154,7 +161,6 @@ class CNECombustiblesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     entry,
                     data_updates={CONF_PASSWORD: user_input[CONF_PASSWORD]},
                 )
-
         return self.async_show_form(
             step_id="reauth_confirm",
             data_schema=vol.Schema({vol.Required(CONF_PASSWORD): str}),
@@ -167,61 +173,14 @@ class CNECombustiblesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
     ) -> CNECombustiblesOptionsFlow:
-        """Return the options flow handler."""
         return CNECombustiblesOptionsFlow()
 
 
 class CNECombustiblesOptionsFlow(config_entries.OptionsFlow):
-    """Handle CNE Combustibles options."""
+    """Handle Chile Combustibles options."""
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Manage options."""
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
-
         current = {**self.config_entry.data, **self.config_entry.options}
-        schema = vol.Schema(
-            {
-                vol.Optional(
-                    CONF_RADIUS_KM,
-                    default=current.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM),
-                ): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=MIN_RADIUS_KM,
-                        max=MAX_RADIUS_KM,
-                        step=1,
-                        unit_of_measurement="km",
-                        mode=selector.NumberSelectorMode.BOX,
-                    )
-                ),
-                vol.Optional(
-                    CONF_INCLUDE_ASSISTED,
-                    default=current.get(
-                        CONF_INCLUDE_ASSISTED, DEFAULT_INCLUDE_ASSISTED
-                    ),
-                ): bool,
-                vol.Optional(
-                    CONF_INCLUDE_SELF_SERVICE,
-                    default=current.get(
-                        CONF_INCLUDE_SELF_SERVICE,
-                        DEFAULT_INCLUDE_SELF_SERVICE,
-                    ),
-                ): bool,
-                vol.Optional(
-                    CONF_UPDATE_INTERVAL_HOURS,
-                    default=current.get(
-                        CONF_UPDATE_INTERVAL_HOURS,
-                        DEFAULT_UPDATE_INTERVAL_HOURS,
-                    ),
-                ): vol.All(
-                    vol.Coerce(int),
-                    vol.Range(
-                        MIN_UPDATE_INTERVAL_HOURS,
-                        MAX_UPDATE_INTERVAL_HOURS,
-                    ),
-                ),
-            }
-        )
-        return self.async_show_form(step_id="init", data_schema=schema)
+        return self.async_show_form(step_id="init", data_schema=_settings_schema(current))

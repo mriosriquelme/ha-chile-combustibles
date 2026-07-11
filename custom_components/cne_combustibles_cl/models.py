@@ -1,4 +1,4 @@
-"""Data models for CNE Combustibles Chile."""
+"""Data models for Chile Combustibles."""
 
 from __future__ import annotations
 
@@ -30,10 +30,25 @@ class FuelOffer:
             f"{self.latitude},{self.longitude}"
         )
 
+    def as_attribute_dict(self) -> dict[str, Any]:
+        """Return a safe representation for entity attributes."""
+        return {
+            "price": round(self.price),
+            "brand": self.brand,
+            "address": self.address,
+            "distance_km": self.distance_km,
+            "service_type": self.service_type,
+            "last_price_update": self.updated_at,
+            "station_code": self.station_code,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "google_maps_url": self.maps_url,
+        }
+
 
 @dataclass(frozen=True, slots=True)
 class StationSummary:
-    """Normalized nearest station information."""
+    """Normalized station information."""
 
     station_code: str
     brand: str
@@ -50,3 +65,15 @@ class StationSummary:
             "https://www.google.com/maps/dir/?api=1&destination="
             f"{self.latitude},{self.longitude}"
         )
+
+    def as_attribute_dict(self) -> dict[str, Any]:
+        """Return a safe representation for entity attributes."""
+        return {
+            "station_code": self.station_code,
+            "brand": self.brand,
+            "address": self.address,
+            "distance_km": self.distance_km,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "google_maps_url": self.maps_url,
+        }

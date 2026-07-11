@@ -1,5 +1,5 @@
 {
-  "title": "CNE Combustibles Chile",
+  "title": "Chile Combustibles",
   "config": {
     "step": {
       "user": {
@@ -8,18 +8,17 @@
         "data": {
           "email": "Correo CNE",
           "password": "Contraseña CNE",
-          "radius_km": "Radio de búsqueda (km)",
+          "radius_km": "Radio de búsqueda",
           "include_assisted": "Incluir precios asistidos",
           "include_self_service": "Incluir precios de autoservicio",
-          "update_interval_hours": "Intervalo de actualización (horas)"
+          "update_interval_hours": "Intervalo de actualización",
+          "top_stations": "Cantidad de estaciones en el Top"
         }
       },
       "reauth_confirm": {
         "title": "Volver a autenticar CNE",
         "description": "Actualiza la contraseña para {email}.",
-        "data": {
-          "password": "Contraseña CNE"
-        }
+        "data": {"password": "Contraseña CNE"}
       }
     },
     "error": {
@@ -35,12 +34,13 @@
   "options": {
     "step": {
       "init": {
-        "title": "Opciones de CNE Combustibles",
+        "title": "Opciones de Chile Combustibles",
         "data": {
-          "radius_km": "Radio de búsqueda (km)",
+          "radius_km": "Radio de búsqueda",
           "include_assisted": "Incluir precios asistidos",
           "include_self_service": "Incluir precios de autoservicio",
-          "update_interval_hours": "Intervalo de actualización (horas)"
+          "update_interval_hours": "Intervalo de actualización",
+          "top_stations": "Cantidad de estaciones en el Top"
         }
       }
     }
@@ -52,7 +52,8 @@
       "fuel_97": {"name": "Gasolina 97 más barata"},
       "fuel_diesel": {"name": "Diésel más barato"},
       "fuel_kerosene": {"name": "Kerosene más barato"},
-      "nearest_station": {"name": "Estación más cercana"}
+      "nearest_station": {"name": "Estación más cercana"},
+      "stations_in_radius": {"name": "Estaciones en el radio"}
     }
   }
 }

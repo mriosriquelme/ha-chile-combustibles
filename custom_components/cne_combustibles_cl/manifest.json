@@ -1,14 +1,12 @@
 {
   "domain": "cne_combustibles_cl",
   "name": "Chile Combustibles",
-  "codeowners": [
-    "@mriosriquelme"
-  ],
+  "codeowners": ["@mriosriquelme"],
   "config_flow": true,
   "documentation": "https://github.com/mriosriquelme/ha-chile-combustibles",
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/mriosriquelme/ha-chile-combustibles/issues",
   "requirements": [],
-  "version": "0.2.2"
+  "version": "0.3.0"
 }
