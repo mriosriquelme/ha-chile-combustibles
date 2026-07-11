@@ -1,0 +1,56 @@
+{
+  "title": "CNE Chile Fuel Prices",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to the CNE API",
+        "description": "The Home Assistant location will be used to find nearby fuel prices.",
+        "data": {
+          "email": "CNE email",
+          "password": "CNE password",
+          "radius_km": "Search radius (km)",
+          "include_assisted": "Include assisted service prices",
+          "include_self_service": "Include self-service prices",
+          "update_interval_hours": "Update interval (hours)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate CNE",
+        "description": "Update the password for {email}.",
+        "data": {"password": "CNE password"}
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to the CNE API.",
+      "invalid_auth": "Invalid email or password.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This account is already configured.",
+      "reauth_successful": "Authentication was updated successfully."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "CNE Fuel options",
+        "data": {
+          "radius_km": "Search radius (km)",
+          "include_assisted": "Include assisted service prices",
+          "include_self_service": "Include self-service prices",
+          "update_interval_hours": "Update interval (hours)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "fuel_93": {"name": "Cheapest 93 gasoline"},
+      "fuel_95": {"name": "Cheapest 95 gasoline"},
+      "fuel_97": {"name": "Cheapest 97 gasoline"},
+      "fuel_diesel": {"name": "Cheapest diesel"},
+      "fuel_kerosene": {"name": "Cheapest kerosene"},
+      "nearest_station": {"name": "Nearest station"}
+    }
+  }
+}
