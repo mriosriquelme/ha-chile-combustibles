@@ -1,5 +1,7 @@
 # CNE Combustibles Chile
 
+![Logo](brand/icon.png)
+
 Integración personalizada para Home Assistant que consulta la API oficial de la Comisión Nacional de Energía (CNE) y expone los precios más bajos de combustibles alrededor de la ubicación configurada en Home Assistant.
 
 ## Entidades
@@ -63,3 +65,19 @@ Los datos son publicados por la Comisión Nacional de Energía. Los precios son 
 ## Licencia
 
 MIT
+
+
+## Dashboard recomendado
+
+El repositorio incluye `dashboard/combustibles_mushroom.yaml`.
+
+1. Instala **Mushroom** desde HACS si aún no lo tienes.
+2. Abre el dashboard y selecciona **Editar → Añadir tarjeta → Manual**.
+3. Pega el contenido del archivo YAML.
+4. Reemplaza los `entity_id` si tu instalación generó nombres diferentes.
+
+Cada tarjeta abre Google Maps al tocarla, usando las coordenadas de la estación con el precio más bajo.
+
+## Recursos de marca
+
+HACS utiliza `brand/icon.png` y `brand/logo.png`. Tras actualizar desde HACS, reinicia Home Assistant y limpia la caché del navegador si el icono anterior continúa apareciendo.

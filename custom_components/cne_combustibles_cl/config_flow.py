@@ -11,6 +11,7 @@ from homeassistant.const import CONF_PASSWORD
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers import selector
 
 from .api import CNEApiClient
 from .const import (
@@ -86,7 +87,15 @@ class CNECombustiblesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_PASSWORD): str,
                 vol.Optional(
                     CONF_RADIUS_KM, default=DEFAULT_RADIUS_KM
-                ): vol.All(vol.Coerce(float), vol.Range(MIN_RADIUS_KM, MAX_RADIUS_KM)),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=MIN_RADIUS_KM,
+                        max=MAX_RADIUS_KM,
+                        step=1,
+                        unit_of_measurement="km",
+                        mode=selector.NumberSelectorMode.BOX,
+                    )
+                ),
                 vol.Optional(
                     CONF_INCLUDE_ASSISTED, default=DEFAULT_INCLUDE_ASSISTED
                 ): bool,
@@ -97,12 +106,14 @@ class CNECombustiblesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Optional(
                     CONF_UPDATE_INTERVAL_HOURS,
                     default=DEFAULT_UPDATE_INTERVAL_HOURS,
-                ): vol.All(
-                    vol.Coerce(int),
-                    vol.Range(
-                        MIN_UPDATE_INTERVAL_HOURS,
-                        MAX_UPDATE_INTERVAL_HOURS,
-                    ),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=MIN_UPDATE_INTERVAL_HOURS,
+                        max=MAX_UPDATE_INTERVAL_HOURS,
+                        step=1,
+                        unit_of_measurement="h",
+                        mode=selector.NumberSelectorMode.BOX,
+                    )
                 ),
             }
         )
@@ -176,7 +187,15 @@ class CNECombustiblesOptionsFlow(config_entries.OptionsFlow):
                 vol.Optional(
                     CONF_RADIUS_KM,
                     default=current.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM),
-                ): vol.All(vol.Coerce(float), vol.Range(MIN_RADIUS_KM, MAX_RADIUS_KM)),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=MIN_RADIUS_KM,
+                        max=MAX_RADIUS_KM,
+                        step=1,
+                        unit_of_measurement="km",
+                        mode=selector.NumberSelectorMode.BOX,
+                    )
+                ),
                 vol.Optional(
                     CONF_INCLUDE_ASSISTED,
                     default=current.get(
