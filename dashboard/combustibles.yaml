@@ -1,38 +1,65 @@
 type: vertical-stack
 cards:
   - type: heading
-    heading: Combustibles cercanos
+    heading: Combustibles más baratos
     icon: mdi:gas-station
-  - type: grid
-    columns: 2
-    square: false
-    cards:
-      - type: tile
-        entity: sensor.cne_combustibles_chile_gasolina_93_mas_barata
-        name: Gasolina 93
-        vertical: false
-      - type: tile
-        entity: sensor.cne_combustibles_chile_gasolina_95_mas_barata
-        name: Gasolina 95
-        vertical: false
-      - type: tile
-        entity: sensor.cne_combustibles_chile_gasolina_97_mas_barata
-        name: Gasolina 97
-        vertical: false
-      - type: tile
-        entity: sensor.cne_combustibles_chile_diesel_mas_barato
-        name: Diésel
-        vertical: false
-      - type: tile
-        entity: sensor.cne_combustibles_chile_kerosene_mas_barato
-        name: Kerosene
-        vertical: false
-      - type: tile
-        entity: sensor.cne_combustibles_chile_estacion_mas_cercana
-        name: Estación más cercana
-        vertical: false
-  - type: entities
-    title: Cobertura
-    entities:
-      - entity: sensor.cne_combustibles_chile_estaciones_en_el_radio
-        name: Estaciones encontradas
+
+  - type: markdown
+    content: >
+      {% set e = 'sensor.cne_combustibles_chile_gasolina_93_mas_barata' %}
+      ## Gasolina 93 · ${{ states(e) }}/L
+
+      **{{ state_attr(e, 'brand') }}** {{ state_attr(e, 'address') }}  
+      📍 {{ state_attr(e, 'distance_km') }} km · {{ state_attr(e, 'service_type') }}  
+      {% set ahorro = state_attr(e, 'estimated_savings_full_tank') | int(0) %}
+      {% if ahorro > 0 %}💰 Ahorro estimado vs. estación más cercana: **${{ ahorro }}**{% endif %}
+
+      [Abrir ruta en Google Maps]({{ state_attr(e, 'google_maps_url') }})
+
+  - type: markdown
+    content: >
+      {% set e = 'sensor.cne_combustibles_chile_gasolina_95_mas_barata' %}
+      ## Gasolina 95 · ${{ states(e) }}/L
+
+      **{{ state_attr(e, 'brand') }}** {{ state_attr(e, 'address') }}  
+      📍 {{ state_attr(e, 'distance_km') }} km · {{ state_attr(e, 'service_type') }}  
+      {% set ahorro = state_attr(e, 'estimated_savings_full_tank') | int(0) %}
+      {% if ahorro > 0 %}💰 Ahorro estimado vs. estación más cercana: **${{ ahorro }}**{% endif %}
+
+      [Abrir ruta en Google Maps]({{ state_attr(e, 'google_maps_url') }})
+
+  - type: markdown
+    content: >
+      {% set e = 'sensor.cne_combustibles_chile_gasolina_97_mas_barata' %}
+      ## Gasolina 97 · ${{ states(e) }}/L
+
+      **{{ state_attr(e, 'brand') }}** {{ state_attr(e, 'address') }}  
+      📍 {{ state_attr(e, 'distance_km') }} km · {{ state_attr(e, 'service_type') }}  
+      {% set ahorro = state_attr(e, 'estimated_savings_full_tank') | int(0) %}
+      {% if ahorro > 0 %}💰 Ahorro estimado vs. estación más cercana: **${{ ahorro }}**{% endif %}
+
+      [Abrir ruta en Google Maps]({{ state_attr(e, 'google_maps_url') }})
+
+  - type: markdown
+    content: >
+      {% set e = 'sensor.cne_combustibles_chile_diesel_mas_barato' %}
+      ## Diésel · ${{ states(e) }}/L
+
+      **{{ state_attr(e, 'brand') }}** {{ state_attr(e, 'address') }}  
+      📍 {{ state_attr(e, 'distance_km') }} km · {{ state_attr(e, 'service_type') }}  
+      {% set ahorro = state_attr(e, 'estimated_savings_full_tank') | int(0) %}
+      {% if ahorro > 0 %}💰 Ahorro estimado vs. estación más cercana: **${{ ahorro }}**{% endif %}
+
+      [Abrir ruta en Google Maps]({{ state_attr(e, 'google_maps_url') }})
+
+  - type: markdown
+    content: >
+      {% set e = 'sensor.cne_combustibles_chile_kerosene_mas_barato' %}
+      ## Kerosene · ${{ states(e) }}/L
+
+      **{{ state_attr(e, 'brand') }}** {{ state_attr(e, 'address') }}  
+      📍 {{ state_attr(e, 'distance_km') }} km · {{ state_attr(e, 'service_type') }}  
+      {% set ahorro = state_attr(e, 'estimated_savings_full_tank') | int(0) %}
+      {% if ahorro > 0 %}💰 Ahorro estimado vs. estación más cercana: **${{ ahorro }}**{% endif %}
+
+      [Abrir ruta en Google Maps]({{ state_attr(e, 'google_maps_url') }})

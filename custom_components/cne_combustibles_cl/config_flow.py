@@ -19,18 +19,22 @@ from .const import (
     CONF_INCLUDE_ASSISTED,
     CONF_INCLUDE_SELF_SERVICE,
     CONF_RADIUS_KM,
+    CONF_TANK_CAPACITY_L,
     CONF_TOP_STATIONS,
     CONF_UPDATE_INTERVAL_HOURS,
     DEFAULT_INCLUDE_ASSISTED,
     DEFAULT_INCLUDE_SELF_SERVICE,
     DEFAULT_RADIUS_KM,
+    DEFAULT_TANK_CAPACITY_L,
     DEFAULT_TOP_STATIONS,
     DEFAULT_UPDATE_INTERVAL_HOURS,
     DOMAIN,
     MAX_RADIUS_KM,
+    MAX_TANK_CAPACITY_L,
     MAX_TOP_STATIONS,
     MAX_UPDATE_INTERVAL_HOURS,
     MIN_RADIUS_KM,
+    MIN_TANK_CAPACITY_L,
     MIN_TOP_STATIONS,
     MIN_UPDATE_INTERVAL_HOURS,
     NAME,
@@ -79,6 +83,10 @@ def _settings_schema(defaults: dict[str, Any]) -> vol.Schema:
                 CONF_TOP_STATIONS,
                 default=defaults.get(CONF_TOP_STATIONS, DEFAULT_TOP_STATIONS),
             ): _number_selector(MIN_TOP_STATIONS, MAX_TOP_STATIONS, "estaciones"),
+            vol.Optional(
+                CONF_TANK_CAPACITY_L,
+                default=defaults.get(CONF_TANK_CAPACITY_L, DEFAULT_TANK_CAPACITY_L),
+            ): _number_selector(MIN_TANK_CAPACITY_L, MAX_TANK_CAPACITY_L, "L"),
         }
     )
 
@@ -122,6 +130,7 @@ class CNECombustiblesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             CONF_UPDATE_INTERVAL_HOURS
                         ],
                         CONF_TOP_STATIONS: user_input[CONF_TOP_STATIONS],
+                        CONF_TANK_CAPACITY_L: user_input[CONF_TANK_CAPACITY_L],
                     },
                 )
 

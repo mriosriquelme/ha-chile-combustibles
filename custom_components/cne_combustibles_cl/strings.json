@@ -12,13 +12,16 @@
           "include_assisted": "Incluir precios asistidos",
           "include_self_service": "Incluir precios de autoservicio",
           "update_interval_hours": "Intervalo de actualización",
-          "top_stations": "Cantidad de estaciones en el Top"
+          "top_stations": "Cantidad de estaciones en el Top",
+          "tank_capacity_l": "Capacidad del estanque para calcular ahorro"
         }
       },
       "reauth_confirm": {
         "title": "Volver a autenticar CNE",
         "description": "Actualiza la contraseña para {email}.",
-        "data": {"password": "Contraseña CNE"}
+        "data": {
+          "password": "Contraseña CNE"
+        }
       }
     },
     "error": {
@@ -40,20 +43,50 @@
           "include_assisted": "Incluir precios asistidos",
           "include_self_service": "Incluir precios de autoservicio",
           "update_interval_hours": "Intervalo de actualización",
-          "top_stations": "Cantidad de estaciones en el Top"
+          "top_stations": "Cantidad de estaciones en el Top",
+          "tank_capacity_l": "Capacidad del estanque para calcular ahorro"
         }
       }
     }
   },
   "entity": {
     "sensor": {
-      "fuel_93": {"name": "Gasolina 93 más barata"},
-      "fuel_95": {"name": "Gasolina 95 más barata"},
-      "fuel_97": {"name": "Gasolina 97 más barata"},
-      "fuel_diesel": {"name": "Diésel más barato"},
-      "fuel_kerosene": {"name": "Kerosene más barato"},
-      "nearest_station": {"name": "Estación más cercana"},
-      "stations_in_radius": {"name": "Estaciones en el radio"}
+      "fuel_93": {
+        "name": "Gasolina 93 más barata"
+      },
+      "fuel_95": {
+        "name": "Gasolina 95 más barata"
+      },
+      "fuel_97": {
+        "name": "Gasolina 97 más barata"
+      },
+      "fuel_diesel": {
+        "name": "Diésel más barato"
+      },
+      "fuel_kerosene": {
+        "name": "Kerosene más barato"
+      },
+      "nearest_station": {
+        "name": "Estación más cercana"
+      },
+      "stations_in_radius": {
+        "name": "Estaciones en el radio"
+      },
+      "fuel_93_location": {
+        "name": "Dónde cargar Gasolina 93"
+      },
+      "fuel_95_location": {
+        "name": "Dónde cargar Gasolina 95"
+      },
+      "fuel_97_location": {
+        "name": "Dónde cargar Gasolina 97"
+      },
+      "fuel_diesel_location": {
+        "name": "Dónde cargar Diésel"
+      },
+      "fuel_kerosene_location": {
+        "name": "Dónde cargar Kerosene"
+      }
     }
   }
 }
