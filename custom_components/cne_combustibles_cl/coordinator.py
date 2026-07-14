@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import timedelta
-import logging
 from math import asin, cos, radians, sin, sqrt
 from statistics import fmean
 from typing import Any
@@ -54,15 +54,21 @@ class CNECoordinatorData:
 class CNECombustiblesCoordinator(DataUpdateCoordinator[CNECoordinatorData]):
     """Coordinate fetching and processing CNE station data."""
 
-    def __init__(self, hass: HomeAssistant, entry: ConfigEntry, client: CNEApiClient) -> None:
+    def __init__(
+        self, hass: HomeAssistant, entry: ConfigEntry, client: CNEApiClient
+    ) -> None:
         self.entry = entry
         self.client = client
         self.home_latitude = float(hass.config.latitude)
         self.home_longitude = float(hass.config.longitude)
-        interval_hours = int(entry.options.get(
-            CONF_UPDATE_INTERVAL_HOURS,
-            entry.data.get(CONF_UPDATE_INTERVAL_HOURS, DEFAULT_UPDATE_INTERVAL_HOURS),
-        ))
+        interval_hours = int(
+            entry.options.get(
+                CONF_UPDATE_INTERVAL_HOURS,
+                entry.data.get(
+                    CONF_UPDATE_INTERVAL_HOURS, DEFAULT_UPDATE_INTERVAL_HOURS
+                ),
+            )
+        )
         super().__init__(
             hass,
             _LOGGER,
@@ -83,24 +89,37 @@ class CNECombustiblesCoordinator(DataUpdateCoordinator[CNECoordinatorData]):
         return self._process_stations(stations)
 
     def _process_stations(self, stations: list[dict[str, Any]]) -> CNECoordinatorData:
-        radius_km = float(self.entry.options.get(
-            CONF_RADIUS_KM, self.entry.data.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM)
-        ))
-        include_assisted = bool(self.entry.options.get(
-            CONF_INCLUDE_ASSISTED,
-            self.entry.data.get(CONF_INCLUDE_ASSISTED, DEFAULT_INCLUDE_ASSISTED),
-        ))
-        include_self_service = bool(self.entry.options.get(
-            CONF_INCLUDE_SELF_SERVICE,
-            self.entry.data.get(CONF_INCLUDE_SELF_SERVICE, DEFAULT_INCLUDE_SELF_SERVICE),
-        ))
-        top_limit = int(self.entry.options.get(
-            CONF_TOP_STATIONS, self.entry.data.get(CONF_TOP_STATIONS, DEFAULT_TOP_STATIONS)
-        ))
-        tank_capacity_l = float(self.entry.options.get(
-            CONF_TANK_CAPACITY_L,
-            self.entry.data.get(CONF_TANK_CAPACITY_L, DEFAULT_TANK_CAPACITY_L),
-        ))
+        radius_km = float(
+            self.entry.options.get(
+                CONF_RADIUS_KM, self.entry.data.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM)
+            )
+        )
+        include_assisted = bool(
+            self.entry.options.get(
+                CONF_INCLUDE_ASSISTED,
+                self.entry.data.get(CONF_INCLUDE_ASSISTED, DEFAULT_INCLUDE_ASSISTED),
+            )
+        )
+        include_self_service = bool(
+            self.entry.options.get(
+                CONF_INCLUDE_SELF_SERVICE,
+                self.entry.data.get(
+                    CONF_INCLUDE_SELF_SERVICE, DEFAULT_INCLUDE_SELF_SERVICE
+                ),
+            )
+        )
+        top_limit = int(
+            self.entry.options.get(
+                CONF_TOP_STATIONS,
+                self.entry.data.get(CONF_TOP_STATIONS, DEFAULT_TOP_STATIONS),
+            )
+        )
+        tank_capacity_l = float(
+            self.entry.options.get(
+                CONF_TANK_CAPACITY_L,
+                self.entry.data.get(CONF_TANK_CAPACITY_L, DEFAULT_TANK_CAPACITY_L),
+            )
+        )
 
         offers: dict[str, list[FuelOffer]] = {key: [] for key in FUEL_DEFINITIONS}
         station_summaries: list[StationSummary] = []
@@ -165,21 +184,30 @@ class CNECombustiblesCoordinator(DataUpdateCoordinator[CNECoordinatorData]):
                         date = offer_data.get("fecha_actualizacion")
                         time = offer_data.get("hora_actualizacion")
                         updated_at = (
-                            f"{date} {time}" if date and time else str(date) if date else None
+                            f"{date} {time}"
+                            if date and time
+                            else str(date)
+                            if date
+                            else None
                         )
-                        offers[fuel_key].append(FuelOffer(
-                            fuel_key=fuel_key,
-                            price=price,
-                            station_code=station_code,
-                            brand=brand,
-                            address=address,
-                            latitude=latitude,
-                            longitude=longitude,
-                            distance_km=round(distance, 2),
-                            service_type=str(offer_data.get("tipo_atencion") or fallback_service_type),
-                            updated_at=updated_at,
-                            unit=offer_data.get("unidad_cobro"),
-                        ))
+                        offers[fuel_key].append(
+                            FuelOffer(
+                                fuel_key=fuel_key,
+                                price=price,
+                                station_code=station_code,
+                                brand=brand,
+                                address=address,
+                                latitude=latitude,
+                                longitude=longitude,
+                                distance_km=round(distance, 2),
+                                service_type=str(
+                                    offer_data.get("tipo_atencion")
+                                    or fallback_service_type
+                                ),
+                                updated_at=updated_at,
+                                unit=offer_data.get("unidad_cobro"),
+                            )
+                        )
 
         station_summaries.sort(key=lambda item: item.distance_km)
         by_price = {
@@ -190,7 +218,9 @@ class CNECombustiblesCoordinator(DataUpdateCoordinator[CNECoordinatorData]):
             key: sorted(values, key=lambda item: (item.distance_km, item.price))
             for key, values in offers.items()
         }
-        cheapest = {key: values[0] if values else None for key, values in by_price.items()}
+        cheapest = {
+            key: values[0] if values else None for key, values in by_price.items()
+        }
         nearest_offers = {
             key: values[0] if values else None for key, values in by_distance.items()
         }
@@ -198,7 +228,9 @@ class CNECombustiblesCoordinator(DataUpdateCoordinator[CNECoordinatorData]):
             key: round(fmean(item.price for item in values), 1) if values else None
             for key, values in by_price.items()
         }
-        in_radius = [item for item in station_summaries if item.distance_km <= radius_km]
+        in_radius = [
+            item for item in station_summaries if item.distance_km <= radius_km
+        ]
 
         return CNECoordinatorData(
             cheapest=cheapest,

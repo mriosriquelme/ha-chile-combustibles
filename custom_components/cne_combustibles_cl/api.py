@@ -52,9 +52,13 @@ class CNEApiClient:
         except CNEAuthenticationError:
             raise
         except (TimeoutError, ClientError, ClientResponseError) as err:
-            raise CNEConnectionError(f"No fue posible autenticar con CNE: {err}") from err
+            raise CNEConnectionError(
+                f"No fue posible autenticar con CNE: {err}"
+            ) from err
         except ValueError as err:
-            raise CNEInvalidResponseError("La respuesta de login no es JSON válido") from err
+            raise CNEInvalidResponseError(
+                "La respuesta de login no es JSON válido"
+            ) from err
 
         token = payload.get("token") if isinstance(payload, dict) else None
         if not token or not isinstance(token, str):
@@ -88,7 +92,9 @@ class CNEApiClient:
             except CNEAuthenticationError:
                 raise
             except (TimeoutError, ClientError, ClientResponseError) as err:
-                raise CNEConnectionError(f"Error consultando estaciones CNE: {err}") from err
+                raise CNEConnectionError(
+                    f"Error consultando estaciones CNE: {err}"
+                ) from err
             except ValueError as err:
                 raise CNEInvalidResponseError(
                     "La respuesta de estaciones no es JSON válido"
