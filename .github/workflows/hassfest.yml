@@ -5,10 +5,13 @@ on:
   pull_request:
 
 jobs:
-  hassfest:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Hassfest validation
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run Hassfest
         uses: home-assistant/actions/hassfest@master
 
