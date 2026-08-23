@@ -59,8 +59,6 @@ class CNECombustiblesCoordinator(DataUpdateCoordinator[CNECoordinatorData]):
     ) -> None:
         self.entry = entry
         self.client = client
-        self.home_latitude = float(hass.config.latitude)
-        self.home_longitude = float(hass.config.longitude)
         interval_hours = int(
             entry.options.get(
                 CONF_UPDATE_INTERVAL_HOURS,
@@ -78,6 +76,16 @@ class CNECombustiblesCoordinator(DataUpdateCoordinator[CNECoordinatorData]):
             config_entry=entry,
         )
 
+    @property
+    def home_latitude(self) -> float:
+        """Return Home Assistant's current latitude."""
+        return float(self.hass.config.latitude)
+
+    @property
+    def home_longitude(self) -> float:
+        """Return Home Assistant's current longitude."""
+        return float(self.hass.config.longitude)
+
     async def _async_update_data(self) -> CNECoordinatorData:
         try:
             stations = await self.client.async_get_stations()
@@ -86,9 +94,18 @@ class CNECombustiblesCoordinator(DataUpdateCoordinator[CNECoordinatorData]):
             raise UpdateFailed("Autenticación CNE inválida") from err
         except CNEError as err:
             raise UpdateFailed(str(err)) from err
-        return self._process_stations(stations)
+        # The CNE returns every station in the country; the distance maths is CPU
+        # bound, so keep it off the event loop.
+        return await self.hass.async_add_executor_job(
+            self._process_stations, stations, self.home_latitude, self.home_longitude
+        )
 
-    def _process_stations(self, stations: list[dict[str, Any]]) -> CNECoordinatorData:
+    def _process_stations(
+        self,
+        stations: list[dict[str, Any]],
+        home_latitude: float,
+        home_longitude: float,
+    ) -> CNECoordinatorData:
         radius_km = float(
             self.entry.options.get(
                 CONF_RADIUS_KM, self.entry.data.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM)
@@ -135,7 +152,7 @@ class CNECombustiblesCoordinator(DataUpdateCoordinator[CNECoordinatorData]):
                 continue
 
             distance = _haversine_km(
-                self.home_latitude, self.home_longitude, latitude, longitude
+                home_latitude, home_longitude, latitude, longitude
             )
             distributor = station.get("distribuidor")
             brand = (
