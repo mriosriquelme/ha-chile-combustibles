@@ -38,34 +38,32 @@ STATIONS_ENDPOINT = "/api/v4/estaciones"
 
 PLATFORMS = ["sensor"]
 
-FUEL_DEFINITIONS: dict[str, dict[str, object]] = {
+UNIT_CLP_PER_LITRE = "CLP/L"
+UNIT_STATIONS = "estaciones"
+
+# Home Assistant rejects entity states longer than 255 characters.
+MAX_STATE_LENGTH = 255
+
+# Display names live in strings.json / translations and icons in icons.json,
+# keyed by the sensor translation_key (fuel_<key> and fuel_<key>_location).
+FUEL_DEFINITIONS: dict[str, dict[str, tuple[str, ...]]] = {
     "93": {
-        "name": "Gasolina 93 más barata",
-        "icon": "mdi:gas-station",
         "assisted_keys": ("93",),
         "self_service_keys": ("A93",),
     },
     "95": {
-        "name": "Gasolina 95 más barata",
-        "icon": "mdi:gas-station",
         "assisted_keys": ("95",),
         "self_service_keys": ("A95",),
     },
     "97": {
-        "name": "Gasolina 97 más barata",
-        "icon": "mdi:gas-station",
         "assisted_keys": ("97",),
         "self_service_keys": ("A97",),
     },
     "diesel": {
-        "name": "Diésel más barato",
-        "icon": "mdi:fuel",
         "assisted_keys": ("DI",),
         "self_service_keys": ("ADI",),
     },
     "kerosene": {
-        "name": "Kerosene más barato",
-        "icon": "mdi:fire",
         "assisted_keys": ("KE",),
         "self_service_keys": ("AKE",),
     },

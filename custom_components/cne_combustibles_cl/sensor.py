@@ -5,7 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.components.sensor import (
+    SensorEntity,
+    SensorEntityDescription,
+    SensorStateClass,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfLength
 from homeassistant.core import HomeAssistant
@@ -13,7 +17,15 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, FUEL_DEFINITIONS, MANUFACTURER, NAME
+from .const import (
+    DOMAIN,
+    FUEL_DEFINITIONS,
+    MANUFACTURER,
+    MAX_STATE_LENGTH,
+    NAME,
+    UNIT_CLP_PER_LITRE,
+    UNIT_STATIONS,
+)
 from .coordinator import CNECombustiblesCoordinator
 from .models import FuelOffer
 
@@ -31,54 +43,38 @@ FUEL_SENSORS = tuple(
     CNEFuelSensorDescription(
         key=fuel_key,
         translation_key=f"fuel_{fuel_key}",
-        name=definition["name"],
-        icon=definition["icon"],
-        native_unit_of_measurement="CLP/L",
+        native_unit_of_measurement=UNIT_CLP_PER_LITRE,
         suggested_display_precision=0,
+        state_class=SensorStateClass.MEASUREMENT,
         fuel_key=fuel_key,
     )
-    for fuel_key, definition in FUEL_DEFINITIONS.items()
+    for fuel_key in FUEL_DEFINITIONS
 )
 
-
-def _build_location_sensors() -> tuple[CNEFuelSensorDescription, ...]:
-    """Build location sensor descriptions."""
-    descriptions: list[CNEFuelSensorDescription] = []
-
-    for fuel_key, definition in FUEL_DEFINITIONS.items():
-        fuel_name = (
-            definition["name"].replace(" más barata", "").replace(" más barato", "")
-        )
-
-        descriptions.append(
-            CNEFuelSensorDescription(
-                key=f"fuel_{fuel_key}_location",
-                translation_key=f"fuel_{fuel_key}_location",
-                name=f"Dónde cargar {fuel_name}",
-                icon="mdi:map-marker-star",
-                fuel_key=fuel_key,
-            )
-        )
-
-    return tuple(descriptions)
-
-
-LOCATION_SENSORS = _build_location_sensors()
+# Text sensors must not declare a unit, a state class or a display precision:
+# any of those makes Home Assistant treat the state as numeric.
+LOCATION_SENSORS = tuple(
+    CNEFuelSensorDescription(
+        key=f"fuel_{fuel_key}_location",
+        translation_key=f"fuel_{fuel_key}_location",
+        fuel_key=fuel_key,
+    )
+    for fuel_key in FUEL_DEFINITIONS
+)
 
 NEAREST_SENSOR = SensorEntityDescription(
     key="nearest_station",
     translation_key="nearest_station",
-    name="Estación más cercana",
-    icon="mdi:map-marker-distance",
     native_unit_of_measurement=UnitOfLength.KILOMETERS,
     suggested_display_precision=2,
+    state_class=SensorStateClass.MEASUREMENT,
 )
 
 STATIONS_COUNT_SENSOR = SensorEntityDescription(
     key="stations_in_radius",
     translation_key="stations_in_radius",
-    name="Estaciones en el radio",
-    icon="mdi:map-marker-radius",
+    native_unit_of_measurement=UNIT_STATIONS,
+    state_class=SensorStateClass.MEASUREMENT,
 )
 
 
@@ -135,11 +131,35 @@ class CNEBaseSensor(
             configuration_url="https://api.cne.cl",
         )
 
+    @property
+    def _has_data(self) -> bool:
+        """Return whether this sensor has a value to report."""
+        return True
 
-class CNEFuelSensor(CNEBaseSensor):
-    """Sensor for the cheapest fuel price."""
+    @property
+    def available(self) -> bool:
+        """Return True when the coordinator succeeded and data is present."""
+        return super().available and self._has_data
+
+
+class CNEFuelFamilySensor(CNEBaseSensor):
+    """Base for sensors bound to a single fuel type."""
 
     entity_description: CNEFuelSensorDescription
+
+    @property
+    def _offer(self) -> FuelOffer | None:
+        """Return the cheapest offer for this fuel."""
+        return self.coordinator.data.cheapest.get(self.entity_description.fuel_key)
+
+    @property
+    def _has_data(self) -> bool:
+        """Return whether an offer was found for this fuel."""
+        return self._offer is not None
+
+
+class CNEFuelSensor(CNEFuelFamilySensor):
+    """Sensor for the cheapest fuel price."""
 
     @property
     def native_value(self) -> float | None:
@@ -189,34 +209,32 @@ class CNEFuelSensor(CNEBaseSensor):
 
         return attrs
 
-    @property
-    def _offer(self) -> FuelOffer | None:
-        """Return the cheapest offer for this fuel."""
-        return self.coordinator.data.cheapest.get(self.entity_description.fuel_key)
 
-
-class CNEFuelLocationSensor(CNEBaseSensor):
+class CNEFuelLocationSensor(CNEFuelFamilySensor):
     """Human-readable recommendation showing where to refuel."""
-
-    entity_description: CNEFuelSensorDescription
 
     @property
     def native_value(self) -> str | None:
-        """Return the recommended station."""
-        offer = self.coordinator.data.cheapest.get(self.entity_description.fuel_key)
-
-        return f"{offer.brand} · {offer.address}" if offer else None
+        """Return the recommended station, capped to the HA state length limit."""
+        offer = self._offer
+        if offer is None:
+            return None
+        return f"{offer.brand} · {offer.address}"[:MAX_STATE_LENGTH]
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the recommended station attributes."""
-        offer = self.coordinator.data.cheapest.get(self.entity_description.fuel_key)
-
+        offer = self._offer
         return offer.as_attribute_dict() if offer else {}
 
 
 class CNENearestStationSensor(CNEBaseSensor):
     """Sensor for the nearest station."""
+
+    @property
+    def _has_data(self) -> bool:
+        """Return whether a nearest station was found."""
+        return self.coordinator.data.nearest_station is not None
 
     @property
     def native_value(self) -> float | None:
