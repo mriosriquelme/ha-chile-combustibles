@@ -12,23 +12,43 @@
           "include_assisted": "Include attended prices",
           "include_self_service": "Include self-service prices",
           "update_interval_hours": "Update interval",
-          "top_stations": "Number of stations in Top list"
+          "top_stations": "Number of stations in Top list",
+          "tank_capacity_l": "Tank capacity used to estimate savings"
         }
       },
       "reauth_confirm": {
         "title": "Reauthenticate CNE",
         "description": "Update the password for {email}.",
-        "data": {"password": "CNE password"}
+        "data": {
+          "password": "CNE password"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Chile Fuel Prices",
+        "description": "Update your credentials and search filters.",
+        "data": {
+          "email": "CNE email",
+          "password": "CNE password",
+          "radius_km": "Search radius",
+          "include_assisted": "Include attended prices",
+          "include_self_service": "Include self-service prices",
+          "update_interval_hours": "Update interval",
+          "top_stations": "Number of stations in Top list",
+          "tank_capacity_l": "Tank capacity used to estimate savings"
+        }
       }
     },
     "error": {
-      "cannot_connect": "Unable to connect to the CNE API.",
+      "cannot_connect": "Could not connect to the CNE API.",
       "invalid_auth": "Invalid email or password.",
-      "unknown": "An unexpected error occurred."
+      "unknown": "An unexpected error occurred.",
+      "select_service_type": "Select at least one service type: attended or self-service."
     },
     "abort": {
       "already_configured": "This account is already configured.",
-      "reauth_successful": "Authentication was updated successfully."
+      "reauth_successful": "Authentication was updated successfully.",
+      "reconfigure_successful": "Configuration was updated successfully.",
+      "unique_id_mismatch": "The email entered belongs to a different CNE account."
     }
   },
   "options": {
@@ -40,20 +60,53 @@
           "include_assisted": "Include attended prices",
           "include_self_service": "Include self-service prices",
           "update_interval_hours": "Update interval",
-          "top_stations": "Number of stations in Top list"
+          "top_stations": "Number of stations in Top list",
+          "tank_capacity_l": "Tank capacity used to estimate savings"
         }
       }
+    },
+    "error": {
+      "select_service_type": "Select at least one service type: attended or self-service."
     }
   },
   "entity": {
     "sensor": {
-      "fuel_93": {"name": "Cheapest 93 gasoline"},
-      "fuel_95": {"name": "Cheapest 95 gasoline"},
-      "fuel_97": {"name": "Cheapest 97 gasoline"},
-      "fuel_diesel": {"name": "Cheapest diesel"},
-      "fuel_kerosene": {"name": "Cheapest kerosene"},
-      "nearest_station": {"name": "Nearest station"},
-      "stations_in_radius": {"name": "Stations within radius"}
+      "fuel_93": {
+        "name": "Cheapest 93 octane petrol"
+      },
+      "fuel_95": {
+        "name": "Cheapest 95 octane petrol"
+      },
+      "fuel_97": {
+        "name": "Cheapest 97 octane petrol"
+      },
+      "fuel_diesel": {
+        "name": "Cheapest diesel"
+      },
+      "fuel_kerosene": {
+        "name": "Cheapest kerosene"
+      },
+      "nearest_station": {
+        "name": "Nearest station"
+      },
+      "stations_in_radius": {
+        "name": "Stations within radius"
+      },
+      "fuel_93_location": {
+        "name": "Where to refuel 93 octane petrol"
+      },
+      "fuel_95_location": {
+        "name": "Where to refuel 95 octane petrol"
+      },
+      "fuel_97_location": {
+        "name": "Where to refuel 97 octane petrol"
+      },
+      "fuel_diesel_location": {
+        "name": "Where to refuel diesel"
+      },
+      "fuel_kerosene_location": {
+        "name": "Where to refuel kerosene"
+      }
     }
   }
 }

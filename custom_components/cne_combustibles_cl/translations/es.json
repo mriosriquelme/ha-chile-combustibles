@@ -22,16 +22,33 @@
         "data": {
           "password": "Contraseña CNE"
         }
+      },
+      "reconfigure": {
+        "title": "Reconfigurar Chile Combustibles",
+        "description": "Actualiza las credenciales y los filtros de búsqueda.",
+        "data": {
+          "email": "Correo CNE",
+          "password": "Contraseña CNE",
+          "radius_km": "Radio de búsqueda",
+          "include_assisted": "Incluir precios asistidos",
+          "include_self_service": "Incluir precios de autoservicio",
+          "update_interval_hours": "Intervalo de actualización",
+          "top_stations": "Cantidad de estaciones en el Top",
+          "tank_capacity_l": "Capacidad del estanque para calcular ahorro"
+        }
       }
     },
     "error": {
       "cannot_connect": "No fue posible conectar con la API de la CNE.",
       "invalid_auth": "Correo o contraseña inválidos.",
-      "unknown": "Ocurrió un error inesperado."
+      "unknown": "Ocurrió un error inesperado.",
+      "select_service_type": "Selecciona al menos un tipo de atención: asistido o autoservicio."
     },
     "abort": {
       "already_configured": "Esta cuenta ya está configurada.",
-      "reauth_successful": "La autenticación fue actualizada correctamente."
+      "reauth_successful": "La autenticación fue actualizada correctamente.",
+      "reconfigure_successful": "La configuración fue actualizada correctamente.",
+      "unique_id_mismatch": "El correo ingresado corresponde a otra cuenta CNE."
     }
   },
   "options": {
@@ -47,6 +64,9 @@
           "tank_capacity_l": "Capacidad del estanque para calcular ahorro"
         }
       }
+    },
+    "error": {
+      "select_service_type": "Selecciona al menos un tipo de atención: asistido o autoservicio."
     }
   },
   "entity": {

@@ -1,0 +1,42 @@
+{
+  "entity": {
+    "sensor": {
+      "fuel_93": {
+        "default": "mdi:gas-station"
+      },
+      "fuel_95": {
+        "default": "mdi:gas-station"
+      },
+      "fuel_97": {
+        "default": "mdi:gas-station"
+      },
+      "fuel_diesel": {
+        "default": "mdi:fuel"
+      },
+      "fuel_kerosene": {
+        "default": "mdi:fire"
+      },
+      "fuel_93_location": {
+        "default": "mdi:map-marker-star"
+      },
+      "fuel_95_location": {
+        "default": "mdi:map-marker-star"
+      },
+      "fuel_97_location": {
+        "default": "mdi:map-marker-star"
+      },
+      "fuel_diesel_location": {
+        "default": "mdi:map-marker-star"
+      },
+      "fuel_kerosene_location": {
+        "default": "mdi:map-marker-star"
+      },
+      "nearest_station": {
+        "default": "mdi:map-marker-distance"
+      },
+      "stations_in_radius": {
+        "default": "mdi:map-marker-radius"
+      }
+    }
+  }
+}
