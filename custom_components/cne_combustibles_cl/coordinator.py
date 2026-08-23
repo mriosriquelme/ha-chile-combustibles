@@ -151,9 +151,7 @@ class CNECombustiblesCoordinator(DataUpdateCoordinator[CNECoordinatorData]):
             except (TypeError, ValueError):
                 continue
 
-            distance = _haversine_km(
-                home_latitude, home_longitude, latitude, longitude
-            )
+            distance = _haversine_km(home_latitude, home_longitude, latitude, longitude)
             distributor = station.get("distribuidor")
             brand = (
                 str(distributor.get("marca") or "Sin marca")

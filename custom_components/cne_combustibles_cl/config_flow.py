@@ -127,9 +127,7 @@ class CNECombustiblesConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> str | None:
         """Try to log in and return an error key when it fails."""
         try:
-            client = CNEApiClient(
-                async_get_clientsession(self.hass), email, password
-            )
+            client = CNEApiClient(async_get_clientsession(self.hass), email, password)
             await client.async_login()
         except CNEAuthenticationError:
             return "invalid_auth"
@@ -149,11 +147,12 @@ class CNECombustiblesConfigFlow(ConfigFlow, domain=DOMAIN):
             email = user_input[CONF_EMAIL].strip().lower()
             await self.async_set_unique_id(email)
             self._abort_if_unique_id_configured()
-            if error := _validate_settings(user_input):
-                errors["base"] = error
-            elif error := await self._async_validate_credentials(
-                email, user_input[CONF_PASSWORD]
-            ):
+            error = _validate_settings(user_input)
+            if not error:
+                error = await self._async_validate_credentials(
+                    email, user_input[CONF_PASSWORD]
+                )
+            if error:
                 errors["base"] = error
             else:
                 return self.async_create_entry(
@@ -222,11 +221,12 @@ class CNECombustiblesConfigFlow(ConfigFlow, domain=DOMAIN):
             email = user_input[CONF_EMAIL].strip().lower()
             await self.async_set_unique_id(email)
             self._abort_if_unique_id_mismatch()
-            if error := _validate_settings(user_input):
-                errors["base"] = error
-            elif error := await self._async_validate_credentials(
-                email, user_input[CONF_PASSWORD]
-            ):
+            error = _validate_settings(user_input)
+            if not error:
+                error = await self._async_validate_credentials(
+                    email, user_input[CONF_PASSWORD]
+                )
+            if error:
                 errors["base"] = error
             else:
                 return self.async_update_reload_and_abort(
