@@ -1,0 +1,23 @@
+name: Reporte de error
+description: Informa un problema con Chile Combustibles
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: Descripción
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Versión de Home Assistant
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Versión de Chile Combustibles
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Registros
